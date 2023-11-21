@@ -68,10 +68,10 @@ const login = async (req, res) => {
     console.log(`User: ${existingUser.name} logged in successfully`);
     res
       .status(200)
-      .json({ status: true, message: "User logged in successfully" });
+      .json({ status: true, message: "User logged in Successfully" });
   } catch (err) {
     console.log(err.message);
-    res.status(500).json({ message: "Could not register user." });
+    res.status(500).json({ message: "server error." });
   }
 };
 
