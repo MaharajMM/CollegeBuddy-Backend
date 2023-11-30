@@ -53,4 +53,38 @@ const registerStudent = async (req, res) => {
   }
 };
 
-module.exports = { registerStudent };
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//  Login student
+
+const login = async (req, res) => {
+  let existingStudent;
+  const { rollNo, password } = req.body;
+  try {
+    existingStudent = await Student.findOne({ rollNo });
+
+    if (!existingStudent) {
+      return res.status(404).json({
+        message: "Could not find Student by this rollNo",
+      });
+    }
+    const isValidPassword = bcrypt.compareSync(
+      password,
+      existingStudent.password
+    );
+    if (!isValidPassword) {
+      return res.status(400).json({
+        message: "Incorrect password",
+      });
+    }
+
+    console.log(`Student: ${existingStudent.name} logged in successfully`);
+    res
+      .status(200)
+      .json({ status: true, message: "Student logged in Successfully" });
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ message: "server error." });
+  }
+};
+
+module.exports = { registerStudent, login };
