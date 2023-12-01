@@ -3,6 +3,7 @@ const controller = require("../controller/student-controller");
 const markshhetController = require("../controller/marksheet");
 const bankController = require("../controller/bankDetails");
 const bookController = require("../controller/library");
+const attendanceController = require("../controller/attendance");
 const router = express.Router();
 
 // router.get("/users", userController.getAllUser);
@@ -25,6 +26,22 @@ router.get("/library/:studentId", bookController.getLibraryDetails);
 router.post("/library/:studentId", bookController.addBookDetails);
 router.delete("/library/:studentId", bookController.removeBookDetails);
 router.put("/library/:studentId", bookController.editBookDetails);
+
+//attendace details
+router.post("/attendance/:studentId", attendanceController.addAttendance);
+router.get("/attendance/:studentId/", attendanceController.getAttendance);
+router.put(
+  "/attendance/:studentId/:semester",
+  attendanceController.updateAttendance
+);
+router.delete(
+  "/attendance/:studentId/:semester",
+  attendanceController.dltAttendance
+);
+router.delete(
+  "/attendance/:studentId/",
+  attendanceController.dltStudentAttendance
+);
 
 // export default router;
 
