@@ -6,7 +6,7 @@ const getLibraryDetails = async (req, res) => {
 
     const libraryDetails = await Library.findOne({
       student: studentId,
-    }).populate("student"); // Populate the 'student' field to get details from the Student model
+    }).populate("all_student"); // Populate the 'student' field to get details from the Student model
 
     if (!libraryDetails) {
       return res

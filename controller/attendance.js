@@ -142,11 +142,9 @@ const dltAttendance = async (req, res) => {
     );
 
     if (semesterIndex === -1) {
-      return res
-        .status(404)
-        .json({
-          message: `Attendance details not found for semester ${semesterToDelete}`,
-        });
+      return res.status(404).json({
+        message: `Attendance details not found for semester ${semesterToDelete}`,
+      });
     }
 
     // Delete the attendance details for the specific semester

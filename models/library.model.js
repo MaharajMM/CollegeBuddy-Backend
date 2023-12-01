@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const librarySchema = new Schema({
   student: {
     type: Schema.Types.ObjectId,
-    ref: "Student",
+    ref: "All_Students",
     required: true,
   },
   booksBorrowed: [

@@ -1,6 +1,7 @@
 const multer = require("multer");
 const path = require("path");
 const Student = require("../models/student");
+const AllStudent = require("../models/student.model");
 
 // Set up multer storage for handling file uploads
 const storage = multer.diskStorage({
@@ -14,13 +15,12 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-const registerStudent = async (req, res) => {
-  let existingStudent;
-  const { name, email, rollNo, registrationNo, phoneNo, session, branch, dob } =
-    req.body;
-
+const addStudent = async (req, res) => {
   try {
-    existingStudent = await Student.findOne({ rollNo });
+    const studentData = req.body;
+    const existingStudent = await AllStudent.findOne({
+      registrationNo: studentData.registrationNo,
+    });
 
     if (existingStudent) {
       return res.status(400).json({
@@ -28,28 +28,28 @@ const registerStudent = async (req, res) => {
       });
     }
 
-    const newStudent = new Student({
-      name,
-      email,
-      rollNo,
-      registrationNo,
-      phoneNo,
-      session,
-      branch,
-      dob,
+    const newStudent = new AllStudent({
+      name: studentData.name,
+      email: studentData.email,
+      rollNo: studentData.rollNo,
+      registrationNo: studentData.registrationNo,
+      phoneNo: studentData.phoneNo,
+      session: studentData.session,
+      branch: studentData.branch,
+      dob: studentData.dob,
       profilePicture: req.file ? req.file.path : null,
     });
 
-    await newStudent.save();
+    const savedStudent = await newStudent.save();
 
-    console.log(`Student ${newStudent.name} registered successfully`);
+    console.log(`Student ${savedStudent.name} registered successfully`);
     res.status(201).json({
       message: "Student registered successfully",
-      student: newStudent,
+      student: savedStudent,
     });
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: "Could not register student." });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -87,4 +87,44 @@ const login = async (req, res) => {
   }
 };
 
-module.exports = { registerStudent, login };
+const getStudents = async (req, res) => {
+  try {
+    const students = await Student.find();
+    res.status(200).json({ message: "success", data: students });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//  get student by roll no.
+
+const getStudentById = async (req, res) => {
+  try {
+    const regdNo = req.params.registrationNo;
+
+    const studentDetails = await Student.findOne({ regdNo });
+
+    if (!studentDetails) {
+      return res.status(404).json({
+        message: "Could not find Student by this rollNo",
+      });
+    }
+
+    return res.status(200).json({
+      message: "success",
+      student: studentDetails,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+module.exports = {
+  login,
+  getStudentById,
+  getStudents,
+  addStudent,
+};

@@ -8,12 +8,24 @@ const router = express.Router();
 
 // router.get("/users", userController.getAllUser);
 // router.post("/signup", userController.signup);
-router.post("/register", controller.registerStudent);
+// router.post("/register", controller.registerStudent);
+router.post("/register", controller.addStudent);
 router.get("/login", controller.login);
+router.get("/", controller.getStudents);
+router.get("/:rollNo", controller.getStudentById);
 
 // marksheet
 router.get("/marksheet/:studentId", markshhetController.marksheet);
 router.post("/marksheet/:studentId", markshhetController.addMarks);
+router.put(
+  "/marksheet/:studentId/:semester",
+  markshhetController.updateMarksheet
+);
+router.delete(
+  "/marksheet/:studentId/:semester",
+  markshhetController.removeSemesterMarksheet
+);
+router.delete("/marksheet/:studentId/", markshhetController.removeMarksheet);
 
 //bank details
 router.get("/bank-details/:studentId", bankController.bankDetails);

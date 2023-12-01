@@ -5,7 +5,7 @@ const Schema = mongoose.Schema;
 const bankDetailSchema = new Schema({
   student: {
     type: Schema.Types.ObjectId,
-    ref: "Student",
+    ref: "All_Students",
     required: true,
   },
   accountHolderName: {
