@@ -2,31 +2,51 @@ const express = require("express");
 const router = express.Router();
 const Marksheet = require("../models/marksheet.model");
 
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//  get marksheet
+
 const marksheet = async (req, res) => {
   try {
     const studentId = req.params.studentId;
 
-    // Find the marksheet using the provided studentId and semester (assuming semester 8)
-    const marksheet = await Marksheet.find({
+    // Find the marksheet using the provided studentId
+    const marksheet = await Marksheet.findOne({
       student: studentId,
     }).populate("student");
 
-    if (!marksheet || marksheet.length === 0) {
+    if (!marksheet) {
       return res.status(404).json({ message: "Marksheet not found" });
     }
 
-    const studentDetails = marksheet[0].student;
+    const studentDetails = marksheet.student;
+
+    // Check if the marksheet has the semesters property
+    if (!marksheet.semesters || !Array.isArray(marksheet.semesters)) {
+      return res.status(404).json({
+        message: "Semesters details not found in the marksheet",
+      });
+    }
+
+    // Modify the marksheet array structure
+    const modifiedMarksheet = marksheet.semesters.map((semester) => ({
+      semester: semester.semester,
+      subjects: semester.subjects,
+      sgpa: semester.sgpa,
+    }));
 
     return res.status(200).json({
       message: "success",
       student: studentDetails,
-      marksheet: marksheet,
+      marksheet: modifiedMarksheet,
     });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//  add marksheet
 
 const addMarks = async (req, res) => {
   try {
@@ -38,20 +58,43 @@ const addMarks = async (req, res) => {
       return res.status(400).json({ message: "Invalid request payload" });
     }
 
-    /// Create a new marksheet instance
-    const newMarksheet = new Marksheet({
-      student: studentId,
-      semester,
-      subjects,
-      sgpa,
-    });
+    // Find the existing marksheet or create a new one if it doesn't exist
+    const existingMarksheet = await Marksheet.findOne({ student: studentId });
 
-    const savedMarksheet = await newMarksheet.save();
+    if (existingMarksheet) {
+      // If the marksheet exists, add a new semester
+      existingMarksheet.semesters.push({
+        semester: semester,
+        subjects,
+        sgpa,
+      });
 
-    res.status(201).json({
-      message: "Marksheet added successfully",
-      marksheet: savedMarksheet,
-    });
+      const savedMarksheet = await existingMarksheet.save();
+
+      res.status(201).json({
+        message: "Marks added successfully",
+        marksheet: savedMarksheet,
+      });
+    } else {
+      // If the marksheet doesn't exist, create a new one
+      const newMarksheet = new Marksheet({
+        student: studentId,
+        semesters: [
+          {
+            semester: semester,
+            subjects,
+            sgpa,
+          },
+        ],
+      });
+
+      const savedMarksheet = await newMarksheet.save();
+
+      res.status(201).json({
+        message: "Marksheet added successfully",
+        marksheet: savedMarksheet,
+      });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
@@ -67,21 +110,37 @@ const updateMarksheet = async (req, res) => {
     const semesterToUpdate = req.params.semester;
     const { subjects, sgpa } = req.body;
 
-    // Find the marksheet details for the provided studentId and semester
+    // Find the marksheet details for the provided studentId
     const existingMarksheet = await Marksheet.findOne({
       student: studentId,
-      semester: semesterToUpdate,
     });
 
     if (!existingMarksheet) {
+      return res.status(404).json({
+        message: "Marksheet not found for the student",
+      });
+    }
+
+    // Find the specific semester to update
+    const semesterToUpdateIndex = existingMarksheet.semesters.findIndex(
+      (semester) => semester.semester === parseInt(semesterToUpdate)
+    );
+
+    if (semesterToUpdateIndex === -1) {
       return res.status(404).json({
         message: "Marksheet details not found for the student and semester",
       });
     }
 
-    // Update the marksheet details for the specific semester
-    existingMarksheet.subjects = subjects;
-    existingMarksheet.sgpa = sgpa;
+    if (subjects && sgpa) {
+      existingMarksheet.semesters[semesterToUpdateIndex].subjects = subjects;
+      existingMarksheet.semesters[semesterToUpdateIndex].sgpa = sgpa;
+    } else if (subjects) {
+      existingMarksheet.semesters[semesterToUpdateIndex].subjects = subjects;
+    } else if (sgpa !== undefined && sgpa !== null) {
+      existingMarksheet.semesters[semesterToUpdateIndex].sgpa = sgpa;
+    }
+    // // Update the marksheet details for the specific semester
 
     await existingMarksheet.save();
 
@@ -103,21 +162,36 @@ const removeSemesterMarksheet = async (req, res) => {
     const studentId = req.params.studentId;
     const semesterToDelete = req.params.semester;
 
-    // Find and delete the marksheet details for the provided studentId and semester
-    const deletedMarksheet = await Marksheet.findOneAndDelete({
+    // Find the marksheet details for the provided studentId
+    const existingMarksheet = await Marksheet.findOne({
       student: studentId,
-      semester: semesterToDelete,
     });
 
-    if (!deletedMarksheet) {
+    if (!existingMarksheet) {
+      return res.status(404).json({
+        message: "Marksheet not found for the student",
+      });
+    }
+
+    // Find the specific semester to delete
+    const semesterToDeleteIndex = existingMarksheet.semesters.findIndex(
+      (semester) => semester.semester === parseInt(semesterToDelete)
+    );
+
+    if (semesterToDeleteIndex === -1) {
       return res.status(404).json({
         message: "Marksheet details not found for the student and semester",
       });
     }
 
+    // Remove the specific semester from the array
+    existingMarksheet.semesters.splice(semesterToDeleteIndex, 1);
+
+    await existingMarksheet.save();
+
     res.json({
-      message: "Marksheet details deleted successfully",
-      marksheetDetails: deletedMarksheet,
+      message: "Marksheet details for the semester deleted successfully",
+      marksheetDetails: existingMarksheet,
     });
   } catch (error) {
     console.error(error);

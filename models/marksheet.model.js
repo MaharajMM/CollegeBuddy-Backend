@@ -8,21 +8,22 @@ const marksheetSchema = new Schema({
     ref: "All_Students",
     required: true,
   },
-  semester: {
-    type: Number,
-    required: true,
-  },
-  subjects: [
+  semesters: [
     {
-      subjectCode: String,
-      subjectName: String,
-      grade: String,
+      semester: {
+        type: Number,
+        required: true,
+      },
+      subjects: [
+        {
+          subjectCode: { type: String },
+          subjectName: { type: String, required: true },
+          grade: { type: String, required: true },
+        },
+      ],
+      sgpa: { type: Number, required: true },
     },
   ],
-  sgpa: {
-    type: Number,
-    required: true,
-  },
 });
 
 const Marksheet = mongoose.model("Marksheet", marksheetSchema);
