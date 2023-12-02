@@ -101,9 +101,9 @@ const getStudents = async (req, res) => {
 
 const getStudentById = async (req, res) => {
   try {
-    const regdNo = req.params.registrationNo;
+    const rollNo = req.params.rollNo;
 
-    const studentDetails = await AllStudent.findOne({ regdNo });
+    const studentDetails = await AllStudent.findOne({ rollNo });
 
     if (!studentDetails) {
       return res.status(404).json({
