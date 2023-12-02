@@ -1,4 +1,4 @@
-const express = require("express");
+
 const BankDetail = require("../models/bank.model");
 
 const bankDetails = async (req, res) => {

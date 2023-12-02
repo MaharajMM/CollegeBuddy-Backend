@@ -1,6 +1,5 @@
 const multer = require("multer");
 const path = require("path");
-const Student = require("../models/student");
 const AllStudent = require("../models/student.model");
 
 // Set up multer storage for handling file uploads
@@ -60,7 +59,7 @@ const login = async (req, res) => {
   let existingStudent;
   const { rollNo, password } = req.body;
   try {
-    existingStudent = await Student.findOne({ rollNo });
+    existingStudent = await AllStudent.findOne({ rollNo });
 
     if (!existingStudent) {
       return res.status(404).json({
@@ -89,7 +88,7 @@ const login = async (req, res) => {
 
 const getStudents = async (req, res) => {
   try {
-    const students = await Student.find();
+    const students = await AllStudent.find();
     res.status(200).json({ message: "success", data: students });
   } catch (error) {
     console.error(error);
@@ -104,7 +103,7 @@ const getStudentById = async (req, res) => {
   try {
     const regdNo = req.params.registrationNo;
 
-    const studentDetails = await Student.findOne({ regdNo });
+    const studentDetails = await AllStudent.findOne({ regdNo });
 
     if (!studentDetails) {
       return res.status(404).json({
