@@ -6,7 +6,7 @@ const getLibraryDetails = async (req, res) => {
 
     const libraryDetails = await Library.findOne({
       student: studentId,
-    }).populate("all_student"); // Populate the 'student' field to get details from the Student model
+    }).populate("student"); // Populate the 'student' field to get details from the Student model
 
     if (!libraryDetails) {
       return res
@@ -36,20 +36,32 @@ const addBookDetails = async (req, res) => {
     if (!Array.isArray(booksBorrowed)) {
       return res.status(400).json({ message: "Invalid request payload" });
     }
+    // Check if there is an existing library record for the student
+    const existingLibrary = await Library.findOne({ student: studentId });
 
-    // Create a new Library instance
-    const newLibrary = new Library({
-      student: studentId,
-      booksBorrowed,
-    });
+    if (existingLibrary) {
+      // If a record is found, update it
+      existingLibrary.booksBorrowed.push(...booksBorrowed);
+      await existingLibrary.save();
 
-    // Save the library details to the database
-    const savedLibrary = await newLibrary.save();
+      res.status(200).json({
+        message: "Library details updated successfully",
+        libraryDetails: existingLibrary,
+      });
+    } else {
+      // If no record is found, create a new one
+      const newLibrary = new Library({
+        student: studentId,
+        booksBorrowed,
+      });
+      // Save the library details to the database
+      const savedLibrary = await newLibrary.save();
 
-    res.status(201).json({
-      message: "Library details added successfully",
-      libraryDetails: savedLibrary,
-    });
+      res.status(201).json({
+        message: "Library details added successfully",
+        libraryDetails: savedLibrary,
+      });
+    }
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
