@@ -46,6 +46,50 @@ const marksheet = async (req, res) => {
 };
 
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//  get attendance by sem
+
+const getMarksheetBySem = async (req, res) => {
+  try {
+    const studentId = req.params.studentId;
+    const semesterNo = parseInt(req.params.semesterNo);
+
+    // Find the marksheet details for the provided studentId and semesterNo
+    const marksheetDetails = await Marksheet.findOne({
+      student: studentId,
+    }).populate("student");
+
+    if (!marksheetDetails) {
+      return res.status(404).json({
+        message: `marksheet details not found for the student in semester ${semesterNo}`,
+      });
+    }
+
+    const studentDetails = marksheetDetails.student;
+
+    // Search for the marksheet record for the specified semester
+    const marksheetRecord = marksheetDetails.semesters.find(
+      (record) => record.semester === semesterNo
+    );
+
+    if (!marksheetRecord) {
+      return res.status(404).json({
+        message: "Attendance record not found for the specified semester",
+      });
+    }
+
+    // Find the attendance details for the provided studentId
+    res.status(200).json({
+      message: "success",
+      student: studentDetails,
+      marksheetRecord,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //  add marksheet
 
 const addMarks = async (req, res) => {
@@ -229,6 +273,7 @@ const removeMarksheet = async (req, res) => {
 
 module.exports = {
   marksheet,
+  getMarksheetBySem,
   addMarks,
   updateMarksheet,
   removeMarksheet,

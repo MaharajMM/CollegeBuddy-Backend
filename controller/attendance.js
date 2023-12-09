@@ -64,9 +64,53 @@ const getAttendance = async (req, res) => {
         .json({ message: "Attendance details not found for the student" });
     }
 
-    res.json({
+    res.status(200).json({
       message: "success",
       attendanceDetails,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+//-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//  get attendance by sem
+
+const getAttendanceBySem = async (req, res) => {
+  try {
+    const studentId = req.params.studentId;
+    const semesterNo = parseInt(req.params.semesterNo);
+
+    // Find the attendance details for the provided studentId and semesterNo
+    const attendanceDetails = await Attendance.findOne({
+      student: studentId,
+    }).populate("student");
+
+    if (!attendanceDetails) {
+      return res.status(404).json({
+        message: `Attendance details not found for the student in semester ${semesterNo}`,
+      });
+    }
+
+    const studentDetails = attendanceDetails.student;
+
+    // Search for the attendance record for the specified semester
+    const attendanceRecord = attendanceDetails.attendance.find(
+      (record) => record.semester === semesterNo
+    );
+
+    if (!attendanceRecord) {
+      return res.status(404).json({
+        message: "Attendance record not found for the specified semester",
+      });
+    }
+
+    // Find the attendance details for the provided studentId
+    res.status(200).json({
+      message: "success",
+      student: studentDetails,
+      attendanceRecord,
     });
   } catch (error) {
     console.error(error);
@@ -190,6 +234,7 @@ const dltStudentAttendance = async (req, res) => {
 module.exports = {
   addAttendance,
   getAttendance,
+  getAttendanceBySem,
   updateAttendance,
   dltAttendance,
   dltStudentAttendance,

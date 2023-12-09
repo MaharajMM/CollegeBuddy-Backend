@@ -16,6 +16,10 @@ router.get("/:rollNo", controller.getStudentById);
 
 // marksheet
 router.get("/marksheet/:studentId", markshhetController.marksheet);
+router.get(
+  "/marksheet/:studentId/:semesterNo",
+  markshhetController.getMarksheetBySem
+);
 router.post("/marksheet/:studentId", markshhetController.addMarks);
 router.put(
   "/marksheet/:studentId/:semester",
@@ -42,6 +46,10 @@ router.put("/library/:studentId", bookController.editBookDetails);
 //attendace details
 router.post("/attendance/:studentId", attendanceController.addAttendance);
 router.get("/attendance/:studentId/", attendanceController.getAttendance);
+router.get(
+  "/attendance/:studentId/:semesterNo",
+  attendanceController.getAttendanceBySem
+);
 router.put(
   "/attendance/:studentId/:semester",
   attendanceController.updateAttendance
