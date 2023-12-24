@@ -9,8 +9,11 @@ const router = express.Router();
 // router.get("/users", userController.getAllUser);
 // router.post("/signup", userController.signup);
 // router.post("/register", controller.registerStudent);
+
+//Student
 router.post("/register", controller.addStudent);
-router.get("/login", controller.login);
+router.post("/login", controller.login);
+router.put("/:rollNo", controller.updateStudent);
 router.get("/", controller.getStudents);
 router.get("/:rollNo", controller.getStudentById);
 

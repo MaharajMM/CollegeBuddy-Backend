@@ -12,6 +12,11 @@ const studentDetailsSchema = new Schema({
     required: true,
     unique: true,
   },
+  password: {
+    type: String,
+    required: true,
+    minlength: 6,
+  },
   rollNo: {
     type: String,
     required: true,
