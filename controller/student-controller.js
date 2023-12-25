@@ -146,7 +146,11 @@ const login = async (req, res) => {
     console.log(`Student: ${existingStudent.name} logged in successfully`);
     res
       .status(200)
-      .json({ status: true, message: "Student logged in Successfully" });
+      .json({
+        status: true,
+        message: "Student logged in Successfully",
+        student: existingStudent,
+      });
   } catch (err) {
     console.log("error:" + err.message);
     res.status(500).json({ message: "server error." });
