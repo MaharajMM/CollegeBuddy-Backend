@@ -30,15 +30,15 @@ const signup = async (req, res) => {
       });
     }
     const hashedPassword = bcrypt.hashSync(password);
-    const user = new User({
+    const newUser = new User({
       name,
       email,
       password: hashedPassword,
     });
-    user.save();
+    newUser.save();
 
-    console.log(`User ${user.name} registered successfully`);
-    res.status(201).json({ message: "User registered successfully", user });
+    console.log(`User ${newUser.name} registered successfully`);
+    res.status(201).json({ message: "User registered successfully", user: newUser });
   } catch (err) {
     console.log(err.message);
     res.status(500).json({ message: "Could not register user." });
