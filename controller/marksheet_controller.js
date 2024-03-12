@@ -104,7 +104,7 @@ const addMarks = async (req, res) => {
 
     // Find the existing marksheet or create a new one if it doesn't exist
     const existingMarksheet = await Marksheet.findOne({ student: studentId });
-
+    
     if (existingMarksheet) {
       // If the marksheet exists, add a new semester
       existingMarksheet.semesters.push({

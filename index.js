@@ -3,7 +3,7 @@
 const mongoose = require("mongoose");
 const router = require("./routes/user-routes");
 const app = require("./app");
-require("./routes")(app);
+require("./routes/router_index")(app);
 
 const port = 8080;
 

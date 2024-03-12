@@ -57,7 +57,7 @@ const studentDetailsSchema = new Schema({
   },
 });
 
-// Create a User model based on the schema
+// Create a all_students model based on the schema
 const AllStudent = mongoose.model("All_Students", studentDetailsSchema);
 
 module.exports = AllStudent;

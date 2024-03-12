@@ -1,9 +1,9 @@
 const express = require("express");
 const controller = require("../controller/student-controller");
-const markshhetController = require("../controller/marksheet");
-const bankController = require("../controller/bankDetails");
-const bookController = require("../controller/library");
-const attendanceController = require("../controller/attendance");
+const marksheetController = require("../controller/marksheet_controller");
+const bankController = require("../controller/bank_details_controller");
+const bookController = require("../controller/library_controller");
+const attendanceController = require("../controller/attendance_controller");
 const router = express.Router();
 
 // router.get("/users", userController.getAllUser);
@@ -18,21 +18,21 @@ router.get("/", controller.getStudents);
 router.get("/:rollNo", controller.getStudentById);
 
 // marksheet
-router.get("/marksheet/:studentId", markshhetController.marksheet);
+router.get("/marksheet/:studentId", marksheetController.marksheet);
 router.get(
   "/marksheet/:studentId/:semesterNo",
-  markshhetController.getMarksheetBySem
+  marksheetController.getMarksheetBySem
 );
-router.post("/marksheet/:studentId", markshhetController.addMarks);
+router.post("/marksheet/:studentId", marksheetController.addMarks);
 router.put(
   "/marksheet/:studentId/:semester",
-  markshhetController.updateMarksheet
+  marksheetController.updateMarksheet
 );
 router.delete(
   "/marksheet/:studentId/:semester",
-  markshhetController.removeSemesterMarksheet
+  marksheetController.removeSemesterMarksheet
 );
-router.delete("/marksheet/:studentId/", markshhetController.removeMarksheet);
+router.delete("/marksheet/:studentId/", marksheetController.removeMarksheet);
 
 //bank details
 router.get("/bank-details/:studentId", bankController.bankDetails);
