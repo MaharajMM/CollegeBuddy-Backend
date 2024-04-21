@@ -4,6 +4,7 @@ const markshhetController = require("../controller/marksheet");
 const bankController = require("../controller/bankDetails");
 const bookController = require("../controller/library");
 const attendanceController = require("../controller/attendance");
+const noticeController = require("../controller/notice");
 const router = express.Router();
 
 // router.get("/users", userController.getAllUser);
@@ -66,6 +67,8 @@ router.delete(
   attendanceController.dltStudentAttendance
 );
 
+//Notice
+router.get("/notice", noticeController.getAllNotices);
 // export default router;
 
 module.exports = router;
